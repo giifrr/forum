@@ -24,7 +24,7 @@ func (server *Server) CreateUser(c *gin.Context) {
 	}
 	user := model.User{
 		Password: input.Password,
-		Email: input.Email,
+		Email:    input.Email,
 		Username: input.Username,
 	}
 	user.Prepare()
@@ -53,7 +53,30 @@ func (server *Server) CreateUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"status": http.StatusCreated,
+		"status":   http.StatusCreated,
 		"response": userCreated,
+	})
+}
+
+func (s *Server) GetUsers(c *gin.Context) {
+	// clear previous error if any
+	errorList = map[string]string{}
+
+	user := model.User{}
+
+	users, err := user.FindAllUsers(s.DB)
+
+	if err != nil {
+		errorList["No_users"] = "No user found"
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": http.StatusInternalServerError,
+			"errors": errorList,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": http.StatusOK,
+		"response": users,
 	})
 }
