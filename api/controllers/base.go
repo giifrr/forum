@@ -23,8 +23,8 @@ func (server *Server) Initialize(Dbdriver, Dbuser, Dbpassword, Dbport, Dbhost, D
 	var err error
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", Dbhost, Dbuser, Dbpassword, Dbname, Dbport)
+	// log.Println("Hello Bang")
 	server.DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	log.Println("Hello Bang")
 	if err != nil {
 		log.Println("Cannot connect to database")
 		log.Fatal("This is the error connecting to postgres:", err)
