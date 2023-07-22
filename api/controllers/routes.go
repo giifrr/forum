@@ -10,5 +10,6 @@ func (s *Server) InitializeRoutes() {
 		// User routes
 		v1.POST("/users", s.CreateUser)
 		v1.GET("/users", s.GetUsers)
+		v1.GET("/users/:id", s.GetUser)
 	}
 }

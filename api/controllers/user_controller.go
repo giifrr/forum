@@ -3,6 +3,7 @@ package controllers
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/giifrr/forum/api/dto"
 	"github.com/giifrr/forum/api/model"
@@ -76,7 +77,41 @@ func (s *Server) GetUsers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"status": http.StatusOK,
+		"status":   http.StatusOK,
 		"response": users,
+	})
+}
+
+func (s *Server) GetUser(c *gin.Context) {
+	errorList = map[string]string{}
+
+	userId := c.Param("id")
+
+	uid, err := strconv.Atoi(userId)
+	if err != nil {
+		errorList["Invalid_request"] = "Invalid request"
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": http.StatusBadRequest,
+			"errors": errorList,
+		})
+		return
+	}
+
+	user := model.User{}
+
+	userGotten, err := user.FindUserById(s.DB, uint32(uid))
+	if err != nil {
+		errorList["No_user"] = "No user found"
+		c.JSON(http.StatusNotFound, gin.H{
+			"status": http.StatusNotFound,
+			"errors": errorList,
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": http.StatusOK,
+		"response": userGotten,
 	})
 }
