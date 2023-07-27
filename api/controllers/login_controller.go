@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/giifrr/forum/api/auth"
@@ -10,6 +9,7 @@ import (
 	"github.com/giifrr/forum/api/security"
 	"github.com/giifrr/forum/api/utils/formaterror"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -28,12 +28,11 @@ func (s *Server) Login(c *gin.Context) {
 
 	user := model.User{
 		Password: input.Password,
-		Email: input.Email,
+		Email:    input.Email,
 	}
 
 	user.Prepare()
 	errorMessages := user.Validate("login")
-	log.Println(errorMessages)
 	if len(errorMessages) > 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"status": http.StatusUnprocessableEntity,
@@ -69,19 +68,19 @@ func (s *Server) SignIn(email, password string) (map[string]interface{}, error) 
 	err = s.DB.Debug().Model(model.User{}).Where("email = ?", email).Take(&user).Error
 
 	if err != nil {
-		log.Println("this is the error getting the user: ", err)
+		log.Errorln("this is the error getting the user: ", err)
 		return nil, err
 	}
 
 	err = security.VerifyPassword(user.Password, password)
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		log.Println("this is the error hashing the password:", err)
+		log.Errorln("this is the error hashing the password:", err)
 		return nil, err
 	}
 
 	token, err := auth.CreateToken(user.ID)
 	if err != nil {
-		log.Println("This is the error creating the token:", err)
+		log.Errorln("This is the error creating the token:", err)
 		return nil, err
 	}
 
