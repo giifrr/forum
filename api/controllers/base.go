@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/giifrr/forum/api/middleware"
 	"github.com/giifrr/forum/api/model"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -24,10 +24,9 @@ func (server *Server) Initialize(Dbdriver, Dbuser, Dbpassword, Dbport, Dbhost, D
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", Dbhost, Dbuser, Dbpassword, Dbname, Dbport)
 	server.DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	log.Println("Hello Bang")
 	if err != nil {
-		log.Println("Cannot connect to database")
-		log.Fatal("This is the error connecting to postgres:", err)
+		log.Errorln("Cannot connect to database")
+		log.Fatalln("This is the error connecting to postgres:", err)
 	} else {
 		log.Println("Connected to database successfully")
 	}
@@ -41,5 +40,5 @@ func (server *Server) Initialize(Dbdriver, Dbuser, Dbpassword, Dbport, Dbhost, D
 }
 
 func (server *Server) Run(addr string) {
-	log.Fatal(http.ListenAndServe(addr, server.Router))
+	log.Fatalln(http.ListenAndServe(addr, server.Router))
 }

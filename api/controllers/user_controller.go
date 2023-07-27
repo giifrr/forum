@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
@@ -31,7 +30,6 @@ func (server *Server) CreateUser(c *gin.Context) {
 	user.Prepare()
 
 	errorMessages := user.Validate("")
-	log.Println(errorMessages)
 	if len(errorMessages) > 0 {
 		errorList = errorMessages
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -40,7 +38,6 @@ func (server *Server) CreateUser(c *gin.Context) {
 		})
 		return
 	}
-	log.Println("Masih ada")
 
 	userCreated, err := user.SaveUser(server.DB)
 	if err != nil {
@@ -111,7 +108,7 @@ func (s *Server) GetUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"status": http.StatusOK,
+		"status":   http.StatusOK,
 		"response": userGotten,
 	})
 }

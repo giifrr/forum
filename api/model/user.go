@@ -9,6 +9,7 @@ import (
 
 	"github.com/badoux/checkmail"
 	"github.com/giifrr/forum/api/security"
+	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -102,6 +103,7 @@ func (u *User) SaveUser(db *gorm.DB) (*User, error) {
 	var err error
 	err = db.Debug().Create(&u).Error
 	if err != nil {
+		log.Errorln(err.Error())
 		return nil, err
 	}
 	return u, nil
@@ -112,6 +114,7 @@ func (u *User) FindAllUsers(db *gorm.DB) (*[]User, error) {
 	users := []User{}
 	err = db.Debug().Find(&users).Error
 	if err != nil {
+		log.Errorln(err.Error())
 		return &[]User{}, err
 	}
 	return &users, nil
