@@ -1,13 +1,11 @@
 package model
 
 import (
-	"errors"
 	"html"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/badoux/checkmail"
 	"github.com/giifrr/forum/api/security"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -53,50 +51,6 @@ func (u *User) AfterFind() (err error) {
 	// dont return the user password
 	u.Password = ""
 	return nil
-}
-
-func (u *User) Validate(action string) map[string]string {
-	var errorMessages = make(map[string]string)
-	var err error
-
-	switch strings.ToLower(action) {
-	case "login":
-		if u.Email == "" {
-			err = errors.New("Required email")
-			errorMessages["Required_email"] = err.Error()
-		}
-		if u.Email != "" {
-			if err = checkmail.ValidateFormat(u.Email); err != nil {
-				err = errors.New("Invalid email")
-				errorMessages["Invalid_email"] = err.Error()
-			}
-		}
-	default:
-		if u.Username == "" {
-			err = errors.New("Required Password")
-			errorMessages["Required_password"] = err.Error()
-		}
-		if u.Username == "" {
-			err = errors.New("Required username")
-			errorMessages["Required_username"] = err.Error()
-		}
-		if u.Password != "" && len(u.Password) < 6 {
-			err = errors.New("Password should be atleast 6 characters")
-			errorMessages["Invalid_password"] = err.Error()
-		}
-		if u.Email == "" {
-			err = errors.New("Required email")
-			errorMessages["Required_email"] = err.Error()
-		}
-		if u.Email != "" {
-			if err = checkmail.ValidateFormat(u.Email); err != nil {
-				err = errors.New("Invalid email")
-				errorMessages["Invalid_email"] = err.Error()
-			}
-		}
-	}
-
-	return errorMessages
 }
 
 func (u *User) SaveUser(db *gorm.DB) (*User, error) {

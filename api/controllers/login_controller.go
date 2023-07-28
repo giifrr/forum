@@ -32,7 +32,7 @@ func (s *Server) Login(c *gin.Context) {
 	}
 
 	user.Prepare()
-	errorMessages := user.Validate("login")
+	errorMessages := formaterror.Validate("login", user)
 	if len(errorMessages) > 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"status": http.StatusUnprocessableEntity,
