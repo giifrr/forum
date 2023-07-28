@@ -1,3 +1,6 @@
+/*
+	This file used for formatting error messages because database errors
+*/
 package formaterror
 
 import "strings"
