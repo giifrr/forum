@@ -85,3 +85,14 @@ func (u *User) FindUserById(db *gorm.DB, id uint32) (*User, error) {
 
 	return u, nil
 }
+
+func (u *User) DeleteUser(db *gorm.DB, id int) (int64, error) {
+	db = db.Debug().Model(&User{}).Where("id = ?", id).Take(&u).Delete(&User{})
+
+	if db.Error != nil {
+		log.Errorln(db.Error)
+		return 0, db.Error
+	}
+
+	return db.RowsAffected, nil
+}

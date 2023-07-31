@@ -1,6 +1,28 @@
 package middleware
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/giifrr/forum/api/auth"
+	"github.com/gin-gonic/gin"
+)
+
+func AuthMiddleware() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		err := auth.TokenValid(ctx)
+		if err != nil {
+			ctx.JSON(http.StatusUnauthorized, gin.H{
+				"status": http.StatusUnauthorized,
+				"message": "Unauthorized",
+			})
+
+			ctx.Abort()
+			return
+		}
+
+		ctx.Next()
+	}
+}
 
 // This enables us interact with the React Frontend
 func CORSMiddleware() gin.HandlerFunc {
