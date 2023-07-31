@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/giifrr/forum/api/auth"
 	"github.com/giifrr/forum/api/dto"
 	"github.com/giifrr/forum/api/model"
 	"github.com/giifrr/forum/api/utils/formaterror"
@@ -110,5 +111,61 @@ func (s *Server) GetUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":   http.StatusOK,
 		"response": userGotten,
+	})
+}
+
+func (s *Server) DeleteUser(c *gin.Context) {
+	errorList = map[string]string{}
+
+	// TODO parsing the userId
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		errorList["Invalid_request"] = "Invalid request"
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": http.StatusBadRequest,
+			"error":  errorList,
+		})
+		return
+	}
+
+	// TODO get user id from token
+	tokenID, err := auth.ExtractTokenID(c)
+	if err != nil {
+		errorList["Unauthorized"] = "Unauthorized"
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status": http.StatusUnauthorized,
+			"error":  errorList,
+		})
+
+		return
+	}
+
+	// TODO if user id is not authenticated user id so the status is unauthorized
+	if tokenID != 0 && tokenID != int64(id) {
+		errorList["Unauthorized"] = "Unauthorized"
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status": http.StatusUnauthorized,
+			"error":  errorList,
+		})
+
+		return
+	}
+
+	// TODO deleting user
+	user := model.User{}
+	rows, err := user.DeleteUser(s.DB, id)
+	if err != nil {
+		errorList["Not_found"] = "User not found"
+		c.JSON(http.StatusNotFound, gin.H{
+			"status": http.NotFound,
+			"error": errorList,
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusNoContent, gin.H{
+		"status": http.StatusNoContent,
+		"message": strconv.Itoa(int(rows)) + " affected",
 	})
 }
