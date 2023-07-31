@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine
+FROM golang:1.20-alpine as builder
 
 # install git
 RUN apk update && apk add --no-cache git
@@ -6,11 +6,15 @@ RUN apk update && apk add --no-cache git
 # where our file will be in the docker container
 WORKDIR /app
 
-# install air  which is used for hot reload each time a file is changed
-RUN go install github.com/cosmtrek/air@latest
-
 COPY . .
 
 RUN go mod tidy
+RUN go build -o binary
 
-ENTRYPOINT  ["air", "-c", ".air.conf"]
+FROM alpine:latest as baseImage
+
+WORKDIR /
+
+COPY --from=builder /app .
+
+ENTRYPOINT ["./binary"]
